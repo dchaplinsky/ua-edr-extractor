@@ -138,20 +138,17 @@ class Pipeline(object):
             rec = base_rec.copy()
 
             rec["Raw founder record"] = founder
-
-            if had_references:
-                rec["Is beneficial owner"] = True
-                owner = self.parser.parse_founders_record(founder, include_stats=True)
-                owner["Name EN"] = list(map(translit, owner["Name"]))
-
-                owner["Was dereferenced"] = True
-                rec.update(owner)
+            owner = self.parser.parse_founders_record(founder, include_stats=True)
+            owner["Name EN"] = list(map(translit, owner["Name"]))
+            rec.update(owner)
 
             yield rec
 
-            # That should be enabled once we'll decide to also parse founders
-            # owner = self.parser.parse_founders_record(founder, include_stats=True)
-            # rec.update(owner)
+            if had_references:
+                bo_rec = rec.copy()
+                bo_rec["Is beneficial owner"] = True
+                bo_rec["Was dereferenced"] = True
+                yield bo_rec
 
     def pump_it(self):
         """
